@@ -1,0 +1,268 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+// ==========================================
+// 1. CLASSE PASSAGER
+// ==========================================
+class Passager {
+private:
+    string idPassager;
+    string nom;
+    string prenom;
+    string telephone;
+
+public:
+    Passager(string id, string n, string p, string tel) 
+        : idPassager(id), nom(n), prenom(p), telephone(tel) {}
+
+    string getId() const { return idPassager; }
+    string getNom() const { return nom; }
+    string getPrenom() const { return prenom; }
+
+    void afficher() const {
+        cout << "ID: " << idPassager << " | Nom: " << nom << " | Prenom: " << prenom << " | Tel: " << telephone << endl;
+    }
+};
+
+// ==========================================
+// 2. CLASSE VOL
+// ==========================================
+class Vol {
+private:
+    string numeroVol;
+    string destination;
+    string dateDepart;
+    int capacite;
+    int placesReservees;
+
+public:
+    Vol(string num, string dest, string date, int cap)
+        : numeroVol(num), destination(dest), dateDepart(date), capacite(cap), placesReservees(0) {}
+
+    string getNumeroVol() const { return numeroVol; }
+    string getDestination() const { return destination; }
+    int getCapacite() const { return capacite; }
+    int getPlacesReservees() const { return placesReservees; }
+
+    bool reserverPlace() {
+        if (placesReservees < capacite) {
+            placesReservees++;
+            return true;
+        }
+        return false;
+    }
+
+    void libererPlace() {
+        if (placesReservees > 0) {
+            placesReservees--;
+        }
+    }
+
+    void afficher() const {
+        cout << "Vol N°: " << numeroVol 
+             << " | Destination: " << destination 
+             << " | Date: " << dateDepart 
+             << " | Capacite: " << capacite 
+             << " | Places reservees: " << placesReservees 
+             << " | Disponibles: " << (capacite - placesReservees) << endl;
+    }
+};
+
+// ==========================================
+// 3. CLASSE RESERVATION
+// ==========================================
+class Reservation {
+private:
+    int idReservation;
+    Passager* passager; // Association avec Passager
+    Vol* vol;           // Association avec Vol
+    bool payee;
+    bool annulee;
+
+public:
+    Reservation(int id, Passager* p, Vol* v)
+        : idReservation(id), passager(p), vol(v), payee(false), annulee(false) {}
+
+    int getIdReservation() const { return idReservation; }
+    Passager* getPassager() const { return passager; }
+    Vol* getVol() const { return vol; }
+    bool estPayee() const { return payee; }
+    bool estAnnulee() const { return annulee; }
+
+    void marquerPayee() { payee = true; }
+    void annuler() { annulee = true; }
+
+    void afficher() const {
+        cout << "Reservation N°: " << idReservation 
+             << " | Passager: " << passager->getNom() << " " << passager->getPrenom()
+             << " | Vol: " << vol->getNumeroVol() 
+             << " | Payee: " << (payee ? "Oui" : "Non") 
+             << " | Annulee: " << (annulee ? "Oui" : "Non") << endl;
+    }
+};
+
+// ==========================================
+// 4. PROGRAMME PRINCIPAL (MENU)
+// ==========================================
+int main() {
+    vector<Passager> passagers;
+    vector<Vol> vols;
+    vector<Reservation> reservations;
+    int choix;
+    int idResCompteur = 1;
+
+    do {
+        cout << "\n=========================================\n";
+        cout << "      MENU PRINCIPAL - AGENCE DE VOYAGE\n";
+        cout << "=========================================\n";
+        cout << "1. Enregistrer un passager\n";
+        cout << "2. Ajouter un vol\n";
+        cout << "3. Afficher les vols disponibles\n";
+        cout << "4. Rechercher les vols disponibles (par destination)\n";
+        cout << "5. Effectuer une reservation\n";
+        cout << "6. Enregistrer un paiement\n";
+        cout << "7. Annuler une reservation\n";
+        cout << "0. Quitter\n";
+        cout << "Votre choix : ";
+        cin >> choix;
+
+        switch (choix) {
+            case 1: {
+                string id, nom, prenom, tel;
+                cout << "Entrer l'ID du passager : "; cin >> id;
+                cout << "Entrer le nom : "; cin >> nom;
+                cout << "Entrer le prenom : "; cin >> prenom;
+                cout << "Entrer le telephone : "; cin >> tel;
+                passagers.push_back(Passager(id, nom, prenom, tel));
+                cout << ">>> Passager enregistre avec succes !\n";
+                break;
+            }
+            case 2: {
+                string num, dest, date;
+                int cap;
+                cout << "Entrer le numero du vol : "; cin >> num;
+                cout << "Entrer la destination : "; cin >> dest;
+                cout << "Entrer la date de depart (JJ/MM/AAAA) : "; cin >> date;
+                cout << "Entrer la capacite maximale : "; cin >> cap;
+                vols.push_back(Vol(num, dest, date, cap));
+                cout << ">>> Vol ajoute avec succes !\n";
+                break;
+            }
+            case 3: {
+                cout << "\n--- LISTE DE TOUS LES VOLS ---\n";
+                if (vols.empty()) {
+                    cout << "Aucun vol enregistre.\n";
+                } else {
+                    for (const auto& v : vols) {
+                        v.afficher();
+                    }
+                }
+                break;
+            }
+            case 4: {
+                string destRecherche;
+                cout << "Entrer la destination recherchee : "; cin >> destRecherche;
+                bool trouve = false;
+                cout << "\n--- RESULTATS DE RECHERCHE ---\n";
+                for (const auto& v : vols) {
+                    if (v.getDestination() == destRecherche) {
+                        v.afficher();
+                        trouve = true;
+                    }
+                }
+                if (!trouve) {
+                    cout << "Aucun vol trouve pour cette destination.\n";
+                }
+                break;
+            }
+            case 5: {
+                string idPassager, numVol;
+                cout << "Entrer l'ID du passager : "; cin >> idPassager;
+                cout << "Entrer le numero du vol : "; cin >> numVol;
+
+                Passager* p = nullptr;
+                Vol* v = nullptr;
+
+                for (auto& pass : passagers) {
+                    if (pass.getId() == idPassager) {
+                        p = &pass;
+                        break;
+                    }
+                }
+
+                for (auto& vol : vols) {
+                    if (vol.getNumeroVol() == numVol) {
+                        v = &vol;
+                        break;
+                    }
+                }
+
+                if (p != nullptr && v != nullptr) {
+                    if (v->reserverPlace()) {
+                        reservations.push_back(Reservation(idResCompteur++, p, v));
+                        cout << ">>> Reservation effectuee avec succes ! (ID: " << (idResCompteur - 1) << ")\n";
+                    } else {
+                        cout << ">>> Erreur : Capacite maximale atteinte, plus de places disponibles.\n";
+                    }
+                } else {
+                    cout << ">>> Erreur : Passager ou vol introuvable.\n";
+                }
+                break;
+            }
+            case 6: {
+                int idRes;
+                cout << "Entrer l'ID de la reservation a payer : "; cin >> idRes;
+                bool trouve = false;
+                for (auto& res : reservations) {
+                    if (res.getIdReservation() == idRes) {
+                        if (!res.estAnnulee()) {
+                            res.marquerPayee();
+                            cout << ">>> Paiement enregistre avec succes !\n";
+                        } else {
+                            cout << ">>> Erreur : Impossible de payer une reservation annulee.\n";
+                        }
+                        trouve = true;
+                        break;
+                    }
+                }
+                if (!trouve) {
+                    cout << ">>> Erreur : Reservation introuvable.\n";
+                }
+                break;
+            }
+            case 7: {
+                int idRes;
+                cout << "Entrer l'ID de la reservation a annuler : "; cin >> idRes;
+                bool trouve = false;
+                for (auto& res : reservations) {
+                    if (res.getIdReservation() == idRes) {
+                        if (!res.estAnnulee()) {
+                            res.annuler();
+                            res.getVol()->libererPlace();
+                            cout << ">>> Reservation annulee avec succes (place liberee).\n";
+                        } else {
+                            cout << ">>> Cette reservation est deja annulee.\n";
+                        }
+                        trouve = true;
+                        break;
+                    }
+                }
+                if (!trouve) {
+                    cout << ">>> Erreur : Reservation introuvable.\n";
+                }
+                break;
+            }
+            case 0:
+                cout << "Fermeture du programme. Au revoir !\n";
+                break;
+            default:
+                cout << "Choix invalide. Veuillez reessayer.\n";
+        }
+    } while (choix != 0);
+
+    return 0;
+}
