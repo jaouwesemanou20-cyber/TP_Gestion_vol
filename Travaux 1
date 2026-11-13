@@ -1,0 +1,83 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+
+class Passager {
+    - idPassager: int
+    - nom: string
+    - prenom: string
+    - passeport: string
+    + Passager(id: int, nom: string, prenom: string, passeport: string)
+    + getIdPassager(): int
+    + getNom(): string
+    + getPrenom(): string
+    + afficherDetails(): void
+}
+
+class Vol {
+    - numeroVol: string
+    - destination: string
+    - capacite: int
+    - placesReservees: int
+    + Vol(num: string, dest: string, cap: int)
+    + getNumeroVol(): string
+    + getDestination(): string
+    + getCapacite(): int
+    + getPlacesReservees(): int
+    + hasPlacesDisponibles(): bool
+    + incrementerPlaces(): void
+    + decrementerPlaces(): void
+    + afficherDetails(): void
+}
+
+class Reservation {
+    - idReservation: int
+    - statut: string 
+    - passager: Passager*
+    - vol: Vol*
+    - paiement: Paiement*
+    + Reservation(id: int, p: Passager*, v: Vol*)
+    + getIdReservation(): int
+    + getStatut(): string
+    + setStatut(s: string): void
+    + getPassager(): Passager*
+    + getVol(): Vol*
+    + getPaiement(): Paiement*
+    + setPaiement(p: Paiement*): void
+    + afficherDetails(): void
+}
+
+class Paiement {
+    - idPaiement: int
+    - montant: double
+    - statutRemboursement: string
+    + Paiement(id: int, montant: double)
+    + getIdPaiement(): int
+    + getMontant(): double
+    + getStatutRemboursement(): string
+    + setStatutRemboursement(statut: string): void
+}
+
+class AgenceVoyage {
+    - passagers: vector<Passager>
+    - vols: vector<Vol>
+    - reservations: vector<Reservation>
+    + enregistrerPassager(): void
+    + ajouterVol(): void
+    + afficherVolsDisponibles(): void
+    + rechercherVol(): void
+    + effectuerReservation(): void
+    + enregistrerPaiement(): void
+    + annulerReservation(): void
+    + consulterReservation(): void
+    + afficherInfosReservation(): void
+}
+
+Passager "1" -- "0..*" Reservation : effectue >
+Vol "1" -- "0..*" Reservation : concerne >
+Reservation "1" o-- "0..1" Paiement : est lié à >
+AgenceVoyage "1" *-- "0..*" Passager : contient
+AgenceVoyage "1" *-- "0..*" Vol : contient
+AgenceVoyage "1" *-- "0..*" Reservation : contient
+
+@enduml
