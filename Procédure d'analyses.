@@ -1,0 +1,16 @@
+cet projet d'application de gestion de réservation de billets d'avion consiste :
+identification des classes nécessaire 
+méthodes et attributs par classe 
+association et multiplicité 
+implémentation en c++.
+structure complète du menu principal 
+    enregistrer un passager 
+    ajouter un vol
+    afficher les vols disponible 
+    rechercher un vol disponible 
+    effectuer une réservation 
+    enregistrer un paiement 
+    annuler une réservation 
+    consulter une réservation 
+    afficher les informations d'une réservation 
+    quitter 
